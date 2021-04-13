@@ -1,0 +1,4 @@
+{
+  "file": "src/styles/style.scss",
+  "includePaths": ["src/styles", "node_modules"]
+}

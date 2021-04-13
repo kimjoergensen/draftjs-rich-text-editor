@@ -1,0 +1,12 @@
+.styleGroup {
+  display: inline-flex;
+  flex-flow: row wrap;
+  padding: 2px;
+
+  &:not(:last-of-type)::after {
+    display: block;
+    margin: 6px 0;
+    border-right: 1px groove rgba(0, 0, 0, 0.1);
+    content: '';
+  }
+}
