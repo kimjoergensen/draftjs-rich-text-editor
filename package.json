@@ -2,7 +2,6 @@
   "license": "ISC",
   "name": "draft-js-example",
   "scripts": {
-    "prestart": "npm i",
     "start": "parcel serve public/index.html"
   },
   "devDependencies": {

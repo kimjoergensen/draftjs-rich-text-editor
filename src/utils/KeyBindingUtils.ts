@@ -17,7 +17,7 @@ namespace KeyBindingUtil {
     return (isOSX && event.altKey) || hasCommandModifier(event);
   }
 
-  export const getDefaultKeyBinding = (event: React.KeyboardEvent): DraftEditorCommand => {
+  export const getDefaultKeyBinding = (event: React.KeyboardEvent): DraftEditorCommand | null => {
     switch (event.key) {
       case 'B':
         return hasCommandModifier(event) ? 'bold' : null;
@@ -61,6 +61,7 @@ namespace KeyBindingUtil {
         return isOSX && hasCommandModifier(event)
           ? 'backspace-to-start-of-line'
           : shouldRemoveWord(event) ? 'backspace-word' : 'backspace'
+      default: return null;
     }
   }
 }

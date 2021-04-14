@@ -59,12 +59,11 @@ export const RichTextEditor: React.FunctionComponent = props => {
     !!editor.current && editor.current.focus();
   }
 
-  const handleKeyBinding = (event: React.KeyboardEvent): string | null => {
+  const handleKeyBinding = (event: React.KeyboardEvent): DraftEditorCommand | null => {
     if (event.key === 'Tab') {
       const newState = RichUtils.onTab(event, editorState, 4);
       if (newState) {
         setEditorState(newState);
-        return 'handled';
       }
     }
     return getDefaultKeyBinding(event);
