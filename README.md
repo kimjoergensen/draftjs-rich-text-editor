@@ -2,7 +2,6 @@
 A Rich Text Editor implementation in React using draftjs.
 
 ## Getting started
----
 ```
 npm start
 
@@ -12,7 +11,6 @@ yarn start
 ```
 
 ## Editing the editor
----
 `src/rich-text-editor/RichTextEditor.tsx`
 
 ### EditorState

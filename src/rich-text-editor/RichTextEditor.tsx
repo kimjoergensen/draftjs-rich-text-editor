@@ -6,52 +6,29 @@ import {
 } from 'draft-js';
 import React from 'react';
 
-import FormatAlignCenter from '@material-ui/icons/FormatAlignCenter';
-import FormatAlignLeft from '@material-ui/icons/FormatAlignLeft';
-import FormatAlignRight from '@material-ui/icons/FormatAlignRight';
-import FormatBold from '@material-ui/icons/FormatBold';
-import FormatIndentDecreaseIcon from '@material-ui/icons/FormatIndentDecrease';
-import FormatIndentIncreaseIcon from '@material-ui/icons/FormatIndentIncrease';
-import FormatItalic from '@material-ui/icons/FormatItalic';
-import FormatListBulleted from '@material-ui/icons/FormatListBulleted';
-import FormatListNumbered from '@material-ui/icons/FormatListNumbered';
-import FormatQuote from '@material-ui/icons/FormatQuote';
-import FormatUnderlined from '@material-ui/icons/FormatUnderlined';
-
-import { BlockStyleControl } from '../style-controls/BlockStyleControl';
-import { FormatStyleControl } from '../style-controls/FormatStyleControl';
-import { InlineStyleControl } from '../style-controls/InlineStyleControl';
+import { BlockStyleControls } from '../style-controls/BlockStyleControls';
+import { FormatStyleControls } from '../style-controls/FormatStyleControls';
+import { InlineStyleControls } from '../style-controls/InlineStyleControls';
 import { StyleGroup } from '../style-group/StyleGroup';
+import { extendedBlockRenderMap } from '../utils/BlockRenderMap';
+import { Block, BlockType } from '../utils/BlockType';
 import { Format, FormatType } from '../utils/FormatType';
 import { Style, StyleType } from '../utils/StyleType';
 import styles from './rich-text-editor.module.scss';
 
-export const RichTextEditor: React.FunctionComponent = props => {
+type StyleGroups = {
+  styles?: StyleType[][];
+  blocks?: BlockType[][];
+  formats?: FormatType[][];
+}
+
+type Props = {
+  styleGroups: StyleGroups;
+}
+
+export const RichTextEditor: React.FunctionComponent<Props> = props => {
   const [editorState, setEditorState] = React.useState(EditorState.createEmpty());
   const editor = React.useRef<Editor>(null);
-
-  const TypographyInlineStyles: StyleType[] = [
-    { icon: <FormatBold />, style: Style.Bold },
-    { icon: <FormatItalic />, style: Style.Italic },
-    { icon: <FormatUnderlined />, style: Style.Underline }
-  ]
-
-  const TextAlignmentStyles: StyleType[] = [
-    { icon: <FormatAlignLeft />, style: Style.AlignLeft },
-    { icon: <FormatAlignCenter />, style: Style.AlignCenter },
-    { icon: <FormatAlignRight />, style: Style.AlignRight }
-  ]
-
-  const BlockStyles: StyleType[] = [
-    { icon: <FormatListBulleted />, style: Style.UnorderedList },
-    { icon: <FormatListNumbered />, style: Style.OrderedList },
-    { icon: <FormatQuote />, style: Style.Blockquote }
-  ]
-
-  const FormatStyles: FormatType[] = [
-    { icon: <FormatIndentIncreaseIcon />, format: Format.Indent },
-    { icon: <FormatIndentDecreaseIcon />, format: Format.Outdent }
-  ]
 
   React.useEffect(() => focusEditor())
 
@@ -79,28 +56,43 @@ export const RichTextEditor: React.FunctionComponent = props => {
 
   const getBlockStyle = (block: ContentBlock): string => {
     switch (block.getType()) {
-      case Style.Blockquote: return styles.blockquote;
-      default: return 'not-handled';
+      case Block.Blockquote: return styles.blockquote;
+      case Block.AlignLeft: return `${styles.align} ${styles.left}`;
+      case Block.AlignCenter: return `${styles.align} ${styles.center}`;
+      case Block.AlignRight: return `${styles.align} ${styles.right}`;
+      default: return '';
     }
   }
 
-  const toggleBlockType = (style: Style) => setEditorState(RichUtils.toggleBlockType(editorState, style));
+  const toggleBlockType = (block: Block) => setEditorState(RichUtils.toggleBlockType(editorState, block));
   const toggleInlineStyle = (style: Style) => setEditorState(RichUtils.toggleInlineStyle(editorState, style));
+  const handleFormat = (format: Format) => setEditorState(RichUtils.toggleInlineStyle(editorState, format));
 
   return (
     <div className={styles.root} onClick={focusEditor}>
-      <div className={styles.styleControls}>
-        <StyleGroup>
-          {TypographyInlineStyles.map(type => <InlineStyleControl key={type.style} editorState={editorState} type={type} onToggle={toggleInlineStyle} />)}
-        </StyleGroup>
-        <StyleGroup>
-          {TextAlignmentStyles.map(type => <BlockStyleControl key={type.style} editorState={editorState} type={type} onToggle={toggleBlockType} />)}
-          {FormatStyles.map(type => <FormatStyleControl key={type.format} editorState={editorState} type={type} onToggle={() => null} />)}
-        </StyleGroup>
-        <StyleGroup>
-          {BlockStyles.map(type => <BlockStyleControl key={type.style} editorState={editorState} type={type} onToggle={toggleBlockType} />)}
-        </StyleGroup>
-      </div>
+      {!!(props.styleGroups.styles || props.styleGroups.blocks) &&
+        <div className={styles.styleControls}>
+          {props.styleGroups.styles
+            ?.map(group =>
+              <StyleGroup>
+                {group.map(type => <InlineStyleControls key={type.style} editorState={editorState} type={type} onToggle={toggleInlineStyle} />)}
+              </StyleGroup>)}
+          {props.styleGroups.blocks
+            ?.map(group =>
+              <StyleGroup>
+                {group.map(type => <BlockStyleControls key={type.block} editorState={editorState} type={type} onToggle={toggleBlockType} />)}
+              </StyleGroup>)}
+        </div>
+      }
+      {!!props.styleGroups.formats &&
+        <div className={styles.styleControls}>
+          {props.styleGroups.formats
+            ?.map(group =>
+              <StyleGroup>
+                {group.map(type => <FormatStyleControls key={type.format} type={type} onClick={() => null} />)}
+              </StyleGroup>)}
+        </div>
+      }
       <div className={styles.editor}>
         <Editor
           spellCheck
@@ -111,6 +103,7 @@ export const RichTextEditor: React.FunctionComponent = props => {
           keyBindingFn={handleKeyBinding}
           onChange={setEditorState}
           blockStyleFn={getBlockStyle}
+          blockRenderMap={extendedBlockRenderMap}
         />
       </div>
     </div>

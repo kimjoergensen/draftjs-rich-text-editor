@@ -7,7 +7,7 @@ type Props = {
   icon: JSX.Element;
 }
 
-export const ButtonComposition: React.FunctionComponent<Props> = props => {
+export const StyleButtonComposition: React.FunctionComponent<Props> = props => {
   return (
     <span className={`${styles.styleButton} ${props.active ? styles.active : ''}`}>
       {props.icon}

@@ -1,21 +1,21 @@
 import React from 'react';
 
-import { Format } from '../utils/FormatType';
-import { ButtonComposition } from './ButtonComposition';
+import { Format, OnClick } from '../utils/FormatType';
+import { StyleButtonComposition } from './StyleButtonComposition';
 
 type Props = {
   icon: JSX.Element;
   format: Format;
-  onToggle: (format: Format) => void;
+  onClick: OnClick;
 }
 
 export const FormatButton: React.FunctionComponent<Props> = props => {
   return (
     <span onMouseDown={event => {
       event.preventDefault();
-      props.onToggle(props.format);
+      props.onClick(props.format);
     }}>
-      <ButtonComposition active={false} icon={props.icon} />
+      <StyleButtonComposition active={false} icon={props.icon} />
     </span>
   )
 }

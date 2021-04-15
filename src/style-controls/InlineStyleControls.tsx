@@ -1,22 +1,22 @@
 import { EditorState } from 'draft-js';
 import React from 'react';
 
-import { StyleButton } from '../style-buttons/StyleButton';
-import { Style, StyleType } from '../utils/StyleType';
+import { InlineButton } from '../style-buttons/InlineButton';
+import { OnToggle, StyleType } from '../utils/StyleType';
 import styles from './style-controls.module.scss';
 
 type Props = {
   editorState: EditorState;
   type: StyleType;
-  onToggle: (style: Style) => void;
+  onToggle: OnToggle;
 }
 
-export const InlineStyleControl: React.FunctionComponent<Props> = props => {
+export const InlineStyleControls: React.FunctionComponent<Props> = props => {
   const currentStyle = props.editorState.getCurrentInlineStyle();
 
   return (
     <div className={styles.controls}>
-      <StyleButton
+      <InlineButton
         active={currentStyle.has(props.type.style)}
         icon={props.type.icon}
         style={props.type.style}

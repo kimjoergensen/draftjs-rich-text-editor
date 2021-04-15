@@ -1,17 +1,17 @@
 import { EditorState } from 'draft-js';
 import React from 'react';
 
-import { StyleButton } from '../style-buttons/StyleButton';
-import { Style, StyleType } from '../utils/StyleType';
+import { BlockButton } from '../style-buttons/BlockButton';
+import { BlockType, OnToggle } from '../utils/BlockType';
 import styles from './style-controls.module.scss';
 
 type Props = {
   editorState: EditorState;
-  type: StyleType;
-  onToggle: (style: Style) => void;
+  type: BlockType;
+  onToggle: OnToggle;
 }
 
-export const BlockStyleControl: React.FunctionComponent<Props> = props => {
+export const BlockStyleControls: React.FunctionComponent<Props> = props => {
   const selection = props.editorState.getSelection();
   const blockType = props.editorState
     .getCurrentContent()
@@ -20,10 +20,10 @@ export const BlockStyleControl: React.FunctionComponent<Props> = props => {
 
   return (
     <div className={styles.controls}>
-      <StyleButton
-        active={props.type.style === blockType}
+      <BlockButton
+        active={props.type.block === blockType}
         icon={props.type.icon}
-        style={props.type.style}
+        block={props.type.block}
         onToggle={props.onToggle}
       />
     </div>

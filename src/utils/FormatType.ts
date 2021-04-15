@@ -1,6 +1,8 @@
+/*Do not change the values of these enums!
+  They are draft.js specific.*/
 export enum Format {
-  Indent,
-  Outdent
+  Indent = 'indent',
+  Outdent = 'outdent'
 }
 
 export class FormatType {
@@ -8,4 +10,4 @@ export class FormatType {
   format: Format;
 }
 
-export type OnToggle = (format: Format) => void;
+export type OnClick = (format: Format) => void;

@@ -24,6 +24,20 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+.align {
+  &.left div, ul, li {
+    text-align: left;
+  }
+
+  &.center div, ul, li {
+    text-align: center;
+  }
+
+  &.right div, ul, li {
+    text-align: right;
+  }
+}
+
 :global {
   .public-DraftEditorPlaceholder-root,
   .public-DraftEditor-content {
