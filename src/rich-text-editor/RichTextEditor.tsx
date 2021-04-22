@@ -1,111 +1,155 @@
-import 'draft-js/dist/Draft.css';
+import 'draft-js/dist/Draft.css'
 
 import {
-  ContentBlock, DraftEditorCommand, DraftHandleValue, Editor, EditorState, getDefaultKeyBinding,
-  RichUtils
-} from 'draft-js';
-import React from 'react';
+  ContentBlock, ContentState, DefaultDraftBlockRenderMap, DraftEditorCommand, DraftHandleValue,
+  Editor, EditorState, getDefaultKeyBinding, Modifier, RichUtils
+} from 'draft-js'
+import Immutable from 'immutable'
+import React from 'react'
 
-import { BlockStyleControls } from '../style-controls/BlockStyleControls';
-import { FormatStyleControls } from '../style-controls/FormatStyleControls';
-import { InlineStyleControls } from '../style-controls/InlineStyleControls';
-import { StyleGroup } from '../style-group/StyleGroup';
-import { extendedBlockRenderMap } from '../utils/BlockRenderMap';
-import { Block, BlockType } from '../utils/BlockType';
-import { Format, FormatType } from '../utils/FormatType';
-import { Style, StyleType } from '../utils/StyleType';
-import styles from './rich-text-editor.module.scss';
+import { Section } from '../section/Section'
+import { BlockStyleControls } from '../style-controls/BlockStyleControls'
+import { FormatStyleControls } from '../style-controls/FormatStyleControls'
+import { InlineStyleControls } from '../style-controls/InlineStyleControls'
+import { StyleGroup } from '../style-group/StyleGroup'
+import { Block, BlockType } from '../utils/BlockType'
+import { FormatType } from '../utils/FormatType'
+import { Style, StyleType } from '../utils/StyleType'
+import styles from './rich-text-editor.module.scss'
 
 type StyleGroups = {
-  styles?: StyleType[][];
-  blocks?: BlockType[][];
-  formats?: FormatType[][];
+  styles?: StyleType[][]
+  blocks?: BlockType[][]
+  formats?: FormatType[][]
 }
 
 type Props = {
-  styleGroups: StyleGroups;
+  styleGroups?: StyleGroups
+  onStateChange?: (contentState: ContentState) => void
 }
 
 export const RichTextEditor: React.FunctionComponent<Props> = props => {
-  const [editorState, setEditorState] = React.useState(EditorState.createEmpty());
-  const editor = React.useRef<Editor>(null);
-
-  React.useEffect(() => focusEditor())
+  const [editorState, setEditorState] = React.useState(EditorState.createEmpty())
+  const editor = React.useRef<Editor>(null)
 
   const focusEditor = () => {
-    !!editor.current && editor.current.focus();
+    !!editor.current && editor.current.focus()
+  }
+
+  const handleStateChange = (newEditorState: EditorState) => {
+    if (newEditorState === editorState) return
+    setEditorState(newEditorState)
+    props.onStateChange && props.onStateChange(newEditorState.getCurrentContent())
   }
 
   const handleKeyBinding = (event: React.KeyboardEvent): DraftEditorCommand | null => {
     if (event.key === 'Tab') {
-      const newState = RichUtils.onTab(event, editorState, 4);
+      const newState = RichUtils.onTab(event, editorState, 4)
       if (newState) {
-        setEditorState(newState);
+        handleStateChange(newState)
       }
     }
-    return getDefaultKeyBinding(event);
+    return getDefaultKeyBinding(event)
   }
 
   const handleKeyCommand = (command: DraftEditorCommand, editorState: EditorState): DraftHandleValue => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
-      setEditorState(newState);
-      return 'handled';
-    } else return 'not-handled';
+      handleStateChange(newState)
+      return 'handled'
+    } else return 'not-handled'
   }
 
-  const getBlockStyle = (block: ContentBlock): string => {
+  const handleReturn = (event: React.KeyboardEvent, state: EditorState): DraftHandleValue => {
+    if (event.shiftKey) {
+      handleStateChange(RichUtils.insertSoftNewline(state))
+      return 'handled'
+    } else return 'not-handled'
+  }
+
+  const insertSection = () => {
+    console.log('insert section')
+    const currentContent = editorState.getCurrentContent()
+    const selection = editorState.getSelection()
+    const textWithEntity = Modifier.splitBlock(currentContent, selection)
+    handleStateChange(EditorState.push(editorState, textWithEntity, 'split-block'))
+  }
+
+  const blockStyle = (block: ContentBlock): string => {
     switch (block.getType()) {
-      case Block.Blockquote: return styles.blockquote;
-      case Block.AlignLeft: return `${styles.align} ${styles.left}`;
-      case Block.AlignCenter: return `${styles.align} ${styles.center}`;
-      case Block.AlignRight: return `${styles.align} ${styles.right}`;
-      default: return '';
+      case Block.Blockquote: return styles.blockquote
+      case Block.AlignLeft: return `${styles.align} ${styles.left}`
+      case Block.AlignCenter: return `${styles.align} ${styles.center}`
+      case Block.AlignRight: return `${styles.align} ${styles.right}`
+      default: return ''
     }
   }
 
-  const toggleBlockType = (block: Block) => setEditorState(RichUtils.toggleBlockType(editorState, block));
-  const toggleInlineStyle = (style: Style) => setEditorState(RichUtils.toggleInlineStyle(editorState, style));
-  const handleFormat = (format: Format) => setEditorState(RichUtils.toggleInlineStyle(editorState, format));
+  const blockRenderer = (contentBlock: ContentBlock) => ({
+    component: Section,
+    editable: true,
+    props: {
+      foo: 'bar'
+    }
+  })
+
+  const blockRenderMap = DefaultDraftBlockRenderMap.merge(Immutable.Map({
+    'unstyled': {
+      element: 'div',
+      wrapper: <Section />
+    }
+  }))
+
+  const renderInlineStyleControls = (styles: StyleType[][]): JSX.Element[] => (
+    styles?.map((group, index) =>
+      <StyleGroup key={index}>
+        {group.map((type, index) => <InlineStyleControls key={index} editorState={editorState} type={type} onToggle={toggleInlineStyle} />)}
+      </StyleGroup>)
+  )
+
+  const renderBlockTypeControls = (blocks: BlockType[][]): JSX.Element[] => (
+    blocks?.map((group, index) =>
+      <StyleGroup key={index}>
+        {group.map((type, index) => <BlockStyleControls key={index} editorState={editorState} type={type} onToggle={toggleBlockType} />)}
+      </StyleGroup>)
+  )
+
+  const renderFormatStyleControls = (formats: FormatType[][]): JSX.Element[] => (
+    formats?.map((group, index) =>
+      <StyleGroup key={index}>
+        {group.map((type, index) => <FormatStyleControls key={index} type={type} onClick={() => null} />)}
+      </StyleGroup>)
+  )
+
+  const toggleBlockType = (block: Block) => handleStateChange(RichUtils.toggleBlockType(editorState, block));
+  const toggleInlineStyle = (style: Style) => handleStateChange(RichUtils.toggleInlineStyle(editorState, style));
 
   return (
-    <div className={styles.root} onClick={focusEditor}>
-      {!!(props.styleGroups.styles || props.styleGroups.blocks) &&
+    <React.Fragment>
+      <button onClick={insertSection} style={{ marginBottom: 5 }}>Insert section</button>
+
+      <div className={styles.root} onClick={focusEditor}>
         <div className={styles.styleControls}>
-          {props.styleGroups.styles
-            ?.map(group =>
-              <StyleGroup>
-                {group.map(type => <InlineStyleControls key={type.style} editorState={editorState} type={type} onToggle={toggleInlineStyle} />)}
-              </StyleGroup>)}
-          {props.styleGroups.blocks
-            ?.map(group =>
-              <StyleGroup>
-                {group.map(type => <BlockStyleControls key={type.block} editorState={editorState} type={type} onToggle={toggleBlockType} />)}
-              </StyleGroup>)}
+          {props.styleGroups?.styles && renderInlineStyleControls(props.styleGroups?.styles)}
+          {props.styleGroups?.blocks && renderBlockTypeControls(props.styleGroups?.blocks)}
+          {props.styleGroups?.formats && renderFormatStyleControls(props.styleGroups?.formats)}
         </div>
-      }
-      {!!props.styleGroups.formats &&
-        <div className={styles.styleControls}>
-          {props.styleGroups.formats
-            ?.map(group =>
-              <StyleGroup>
-                {group.map(type => <FormatStyleControls key={type.format} type={type} onClick={() => null} />)}
-              </StyleGroup>)}
+
+        <div className={styles.editor}>
+          <Editor
+            spellCheck
+            ref={editor}
+            editorState={editorState}
+            handleReturn={handleReturn}
+            textAlignment='left'
+            handleKeyCommand={handleKeyCommand}
+            keyBindingFn={handleKeyBinding}
+            onChange={handleStateChange}
+            blockStyleFn={blockStyle}
+            blockRendererFn={blockRenderer}
+          />
         </div>
-      }
-      <div className={styles.editor}>
-        <Editor
-          spellCheck
-          ref={editor}
-          editorState={editorState}
-          textAlignment='left'
-          handleKeyCommand={handleKeyCommand}
-          keyBindingFn={handleKeyBinding}
-          onChange={setEditorState}
-          blockStyleFn={getBlockStyle}
-          blockRenderMap={extendedBlockRenderMap}
-        />
       </div>
-    </div>
+    </React.Fragment>
   );
 }

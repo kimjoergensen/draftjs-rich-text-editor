@@ -1,5 +1,8 @@
 # draftjs-rich-text-editor
+<p align=center>
 A Rich Text Editor implementation in React using draftjs.
+<p align=center><img src="./public/example.png" /><p>
+</p>
 
 ## Getting started
 ```

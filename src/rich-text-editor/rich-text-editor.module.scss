@@ -48,6 +48,18 @@
     min-height: 100px;
   }
 
+  .public-DraftEditor-content > div[data-contents] {
+    // > * {
+    //   &:hover {
+    //     background: rgba(0,0,0,0.02);
+    //   }
+    // }
+
+    & > div:not(:first-child), ul {
+      margin: 0.5em 0 0;
+    }
+  }
+
   .public-RichStyleDefault-pre {
     background-color: rgba(0, 0, 0, 0.05);
     font-family: "Inconsolata", "Menlo", "Consolas", monospace;

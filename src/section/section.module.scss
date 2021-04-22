@@ -1,0 +1,25 @@
+.section {
+  > div {
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+
+      > .insertSection {
+        display: initial;
+      }
+    }
+  }
+
+  // unstyled elements in draft.js are div elements.
+  // change the selector here, if draft.js updates the element
+  // for unstyled types.
+  > div {
+    margin: 5px 0;
+  }
+}
+
+.insertSection {
+  display: none;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}

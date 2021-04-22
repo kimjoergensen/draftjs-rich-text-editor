@@ -1,4 +1,4 @@
-import { DraftEditorCommand } from 'draft-js';
+import { DraftEditorCommand, getDefaultKeyBinding as draftGetDefaultKeyBinding } from 'draft-js';
 
 namespace KeyBindingUtil {
   const isOSX = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -61,7 +61,7 @@ namespace KeyBindingUtil {
         return isOSX && hasCommandModifier(event)
           ? 'backspace-to-start-of-line'
           : shouldRemoveWord(event) ? 'backspace-word' : 'backspace'
-      default: return null;
+      default: return draftGetDefaultKeyBinding(event);
     }
   }
 }
