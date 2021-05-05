@@ -1,4 +1,6 @@
-import { DraftEditorCommand, getDefaultKeyBinding as draftGetDefaultKeyBinding } from 'draft-js';
+import {
+  DraftEditorCommand, EditorState, getDefaultKeyBinding as draftGetDefaultKeyBinding, RichUtils
+} from 'draft-js'
 
 namespace KeyBindingUtil {
   const isOSX = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -15,6 +17,13 @@ namespace KeyBindingUtil {
 
   const shouldRemoveWord = (event: React.KeyboardEvent): boolean => {
     return (isOSX && event.altKey) || hasCommandModifier(event);
+  }
+
+  export const getStateByKeyBinding = (event: React.KeyboardEvent, state: EditorState): EditorState | null => {
+    switch (event.key) {
+      case 'Tab': return RichUtils.onTab(event, state, 4)
+      default: return null
+    }
   }
 
   export const getDefaultKeyBinding = (event: React.KeyboardEvent): DraftEditorCommand | null => {

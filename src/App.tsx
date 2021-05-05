@@ -16,13 +16,39 @@ import FormatListNumbered from '@material-ui/icons/FormatListNumbered'
 import FormatQuote from '@material-ui/icons/FormatQuote'
 import FormatUnderlined from '@material-ui/icons/FormatUnderlined'
 
+import { Vacancy } from './data/models/vacancy'
+import { VacancyService } from './data/service'
 import { RichTextEditor } from './rich-text-editor/RichTextEditor'
-import { Block, BlockType } from './utils/BlockType'
-import { Format, FormatType } from './utils/FormatType'
-import { Style, StyleType } from './utils/StyleType'
+import { Block, BlockType } from './utils/block-type'
+import { Format, FormatType } from './utils/format-type'
+import { Style, StyleType } from './utils/style-type'
+
+type DataSourceModel = {
+  vacancy: Vacancy
+}
 
 export const App: React.FunctionComponent = props => {
-  const [contentState, setContentState] = React.useState<ContentState>(ContentState.createFromText(''));
+  const VACANCY_ID = 1
+  const [contentState, setContentState] = React.useState<ContentState>(ContentState.createFromText(''))
+  const [autocomplete, setAutocomplete] = React.useState(null)
+  const [dataSource, setDataSource] = React.useState<DataSourceModel>()
+
+  const fetchVacancy = React.useCallback(async () => {
+    const delay = async (milliSeconds: number): Promise<void> =>
+      new Promise(resolve => setTimeout(resolve, milliSeconds))
+
+    try {
+      // await delay(1000)
+      const vacancy = await VacancyService.get(VACANCY_ID)
+      setDataSource({ vacancy: vacancy })
+    } catch (error) {
+      console.error(error)
+    }
+  }, [VACANCY_ID])
+
+  React.useEffect(() => {
+    fetchVacancy()
+  }, [fetchVacancy])
 
   const TypographyInlineStyles: StyleType[] = [
     { icon: <FormatBold />, style: Style.Bold },
@@ -47,22 +73,28 @@ export const App: React.FunctionComponent = props => {
     { icon: <FormatIndentDecreaseIcon />, format: Format.Outdent }
   ]
 
-  const handleStateChange = (newContentState: ContentState) => setContentState(newContentState);
+  const handleStateChange = (state: ContentState) => setContentState(state)
 
   return (
     <div style={{ maxWidth: 500, margin: '0 auto' }}>
-      <RichTextEditor onStateChange={handleStateChange} styleGroups={{
-        styles: [TypographyInlineStyles],
-        blocks: [TextAlignmentStyles, BlockStyles],
-        formats: [FormatStyles]
-      }} />
-      <div style={{ margin: '5px 0' }}>
-        <label htmlFor="html-output" style={{ fontSize: 12, padding: 0, margin: 0 }}>HTML format</label>
-        <pre id="html-output" style={{ whiteSpace: 'pre-wrap', border: '1px groove #eee', padding: 2, margin: 0 }}>
-          {stateToHTML(contentState)}
-        </pre>
-        <ReactJson collapsed src={contentState} />
-      </div>
+      {!!dataSource &&
+        <React.Fragment>
+          <RichTextEditor
+            onStateChange={handleStateChange}
+            styleGroups={{
+              styles: [TypographyInlineStyles],
+              blocks: [TextAlignmentStyles, BlockStyles],
+              formats: [FormatStyles]
+            }} />
+          <div style={{ margin: '5px 0' }}>
+            <label htmlFor="html-output" style={{ fontSize: 12, padding: 0, margin: 0 }}>HTML format</label>
+            <pre id="html-output" style={{ whiteSpace: 'pre-wrap', border: '1px groove #eee', padding: 2, margin: 0 }}>
+              {stateToHTML(contentState)}
+            </pre>
+            <ReactJson src={dataSource} />
+            {/* <ReactJson collapsed src={contentState} /> */}
+          </div>
+        </React.Fragment> || <p>Loading...</p>}
     </div>
   )
 }
@@ -70,4 +102,4 @@ export const App: React.FunctionComponent = props => {
 ReactDOM.render(
   <App />,
   document.getElementById('app')
-);
+)

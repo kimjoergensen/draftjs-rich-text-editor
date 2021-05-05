@@ -1,7 +1,7 @@
-import React from 'react';
+import React from 'react'
 
-import { Format, OnClick } from '../utils/FormatType';
-import { StyleButtonComposition } from './StyleButtonComposition';
+import { Format, OnClick } from '../utils/format-type'
+import { StyleButtonComposition } from './StyleButtonComposition'
 
 type Props = {
   icon: JSX.Element;

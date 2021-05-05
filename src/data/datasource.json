@@ -1,0 +1,53 @@
+{
+  "vacancies": [
+    {
+      "id": 1,
+      "unit": {
+        "id": 1,
+        "address": {
+          "id": 1,
+          "street": "Testvej",
+          "number": 7,
+          "postal": "7100"
+        }
+      },
+      "actors": [
+        {
+          "id": 1,
+          "type": 0,
+          "firstName": "John",
+          "middleName": null,
+          "lastName": "Doe"
+        },
+        {
+          "id": 2,
+          "type": 1,
+          "firstName": "Gibson",
+          "middleName": null,
+          "lastName": "Montgomery-Gibson"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "unit": {
+        "id": 2,
+        "address": {
+          "id": 2,
+          "street": "Vejlevej",
+          "number": 9,
+          "postal": "7100"
+        }
+      },
+      "actors": [
+        {
+          "id": 3,
+          "type": 0,
+          "firstName": "Norman",
+          "middleName": null,
+          "lastName": "Gordon"
+        }
+      ]
+    }
+  ]
+}

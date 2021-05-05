@@ -2,16 +2,18 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "module": "CommonJS",
-    "target": "ES5",
-    "jsx": "react",
-    "lib": ["ES6", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "es5",
+    "jsx": "react-jsx",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "rootDir": "src",
-    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "rootDir": "src"
   },
   "exclude": [
     "node_modules",

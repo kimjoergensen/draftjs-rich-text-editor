@@ -1,8 +1,8 @@
-import React from 'react';
+import React from 'react'
 
-import { FormatButton } from '../style-buttons/FormatButton';
-import { FormatType, OnClick } from '../utils/FormatType';
-import styles from './style-controls.module.scss';
+import { FormatButton } from '../style-buttons/FormatButton'
+import { FormatType, OnClick } from '../utils/format-type'
+import styles from './style-controls.module.scss'
 
 type Props = {
   type: FormatType;

@@ -12,9 +12,11 @@ import { BlockStyleControls } from '../style-controls/BlockStyleControls'
 import { FormatStyleControls } from '../style-controls/FormatStyleControls'
 import { InlineStyleControls } from '../style-controls/InlineStyleControls'
 import { StyleGroup } from '../style-group/StyleGroup'
-import { Block, BlockType } from '../utils/BlockType'
-import { FormatType } from '../utils/FormatType'
-import { Style, StyleType } from '../utils/StyleType'
+import { Block, BlockType } from '../utils/block-type'
+import { compositeDecorator } from '../utils/composite-decorator'
+import { FormatType } from '../utils/format-type'
+import KeyBindingUtil from '../utils/key-binding-utils'
+import { Style, StyleType } from '../utils/style-type'
 import styles from './rich-text-editor.module.scss'
 
 type StyleGroups = {
@@ -29,31 +31,27 @@ type Props = {
 }
 
 export const RichTextEditor: React.FunctionComponent<Props> = props => {
-  const [editorState, setEditorState] = React.useState(EditorState.createEmpty())
+  const [editorState, setEditorState] = React.useState(EditorState.createEmpty(compositeDecorator))
   const editor = React.useRef<Editor>(null)
 
   const focusEditor = () => {
     !!editor.current && editor.current.focus()
   }
 
-  const handleStateChange = (newEditorState: EditorState) => {
+  const handleStateChange = (newEditorState: EditorState): void => {
     if (newEditorState === editorState) return
     setEditorState(newEditorState)
     props.onStateChange && props.onStateChange(newEditorState.getCurrentContent())
   }
 
   const handleKeyBinding = (event: React.KeyboardEvent): DraftEditorCommand | null => {
-    if (event.key === 'Tab') {
-      const newState = RichUtils.onTab(event, editorState, 4)
-      if (newState) {
-        handleStateChange(newState)
-      }
-    }
+    const newState = KeyBindingUtil.getStateByKeyBinding(event, editorState)
+    if (newState) handleStateChange(newState)
     return getDefaultKeyBinding(event)
   }
 
   const handleKeyCommand = (command: DraftEditorCommand, editorState: EditorState): DraftHandleValue => {
-    const newState = RichUtils.handleKeyCommand(editorState, command);
+    const newState = RichUtils.handleKeyCommand(editorState, command)
     if (newState) {
       handleStateChange(newState)
       return 'handled'
@@ -77,10 +75,10 @@ export const RichTextEditor: React.FunctionComponent<Props> = props => {
 
   const blockStyle = (block: ContentBlock): string => {
     switch (block.getType()) {
-      case Block.Blockquote: return styles.blockquote
-      case Block.AlignLeft: return `${styles.align} ${styles.left}`
-      case Block.AlignCenter: return `${styles.align} ${styles.center}`
-      case Block.AlignRight: return `${styles.align} ${styles.right}`
+      // case Block.Blockquote: return styles.blockquote
+      case Block.AlignLeft: return `${styles.align__left}`
+      case Block.AlignCenter: return `${styles.align__center}`
+      case Block.AlignRight: return `${styles.align__right}`
       default: return ''
     }
   }
@@ -121,8 +119,8 @@ export const RichTextEditor: React.FunctionComponent<Props> = props => {
       </StyleGroup>)
   )
 
-  const toggleBlockType = (block: Block) => handleStateChange(RichUtils.toggleBlockType(editorState, block));
-  const toggleInlineStyle = (style: Style) => handleStateChange(RichUtils.toggleInlineStyle(editorState, style));
+  const toggleBlockType = (block: Block) => handleStateChange(RichUtils.toggleBlockType(editorState, block))
+  const toggleInlineStyle = (style: Style) => handleStateChange(RichUtils.toggleInlineStyle(editorState, style))
 
   return (
     <React.Fragment>
@@ -140,16 +138,15 @@ export const RichTextEditor: React.FunctionComponent<Props> = props => {
             spellCheck
             ref={editor}
             editorState={editorState}
+            onChange={handleStateChange}
             handleReturn={handleReturn}
-            textAlignment='left'
             handleKeyCommand={handleKeyCommand}
             keyBindingFn={handleKeyBinding}
-            onChange={handleStateChange}
             blockStyleFn={blockStyle}
             blockRendererFn={blockRenderer}
           />
         </div>
       </div>
     </React.Fragment>
-  );
+  )
 }

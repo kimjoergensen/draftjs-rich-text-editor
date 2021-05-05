@@ -1,7 +1,7 @@
-import React from 'react';
+import React from 'react'
 
-import { Block, OnToggle } from '../utils/BlockType';
-import { StyleButtonComposition } from './StyleButtonComposition';
+import { Block, OnToggle } from '../utils/block-type'
+import { StyleButtonComposition } from './StyleButtonComposition'
 
 type Props = {
   active: boolean;

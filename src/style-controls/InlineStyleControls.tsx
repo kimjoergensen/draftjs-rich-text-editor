@@ -1,9 +1,9 @@
-import { EditorState } from 'draft-js';
-import React from 'react';
+import { EditorState } from 'draft-js'
+import React from 'react'
 
-import { InlineButton } from '../style-buttons/InlineButton';
-import { OnToggle, StyleType } from '../utils/StyleType';
-import styles from './style-controls.module.scss';
+import { InlineButton } from '../style-buttons/InlineButton'
+import { OnToggle, StyleType } from '../utils/style-type'
+import styles from './style-controls.module.scss'
 
 type Props = {
   editorState: EditorState;

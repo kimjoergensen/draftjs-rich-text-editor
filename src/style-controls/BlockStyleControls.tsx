@@ -1,9 +1,9 @@
-import { EditorState } from 'draft-js';
-import React from 'react';
+import { EditorState } from 'draft-js'
+import React from 'react'
 
-import { BlockButton } from '../style-buttons/BlockButton';
-import { BlockType, OnToggle } from '../utils/BlockType';
-import styles from './style-controls.module.scss';
+import { BlockButton } from '../style-buttons/BlockButton'
+import { BlockType, OnToggle } from '../utils/block-type'
+import styles from './style-controls.module.scss'
 
 type Props = {
   editorState: EditorState;
